@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>CalcSci - Calculatrice Scientifique</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -15,35 +15,55 @@
             font-family: 'Space Grotesk', sans-serif;
         }
         .glass {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.08);
             backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.15);
         }
         .display {
-            background: rgba(0, 0, 0, 0.6);
+            background: rgba(0, 0, 0, 0.7);
             backdrop-filter: blur(10px);
         }
         .btn {
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 1.1rem;
         }
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.3);
+        .btn:active {
+            transform: scale(0.95);
         }
         .operator {
-            background: rgba(249, 115, 22, 0.2);
+            background: rgba(249, 115, 22, 0.25);
             color: #fb923c;
         }
         .scientific {
-            background: rgba(59, 130, 246, 0.2);
+            background: rgba(59, 130, 246, 0.25);
             color: #60a5fa;
+        }
+        #calculator {
+            height: 100dvh;
+            max-height: 100dvh;
+        }
+        .keyboard {
+            grid-template-rows: repeat(7, 1fr);
+        }
+        .history {
+            max-height: 80px;
+            scrollbar-width: thin;
+        }
+        @media (max-width: 640px) {
+            .btn {
+                font-size: 1.25rem;
+                padding: 0.75rem;
+            }
+            .display {
+                font-size: 2.5rem;
+            }
         }
     </style>
 </head>
-<body class="bg-zinc-950 text-white min-h-screen flex items-center justify-center p-4">
-    <div class="max-w-md w-full">
+<body class="bg-zinc-950 text-white overflow-hidden">
+    <div id="calculator" class="flex flex-col h-screen max-w-md mx-auto w-full p-4">
         <!-- Header -->
-        <div class="flex items-center justify-between mb-6">
+        <div class="flex items-center justify-between mb-4 flex-shrink-0">
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 bg-gradient-to-br from-orange-500 to-blue-500 rounded-2xl flex items-center justify-center">
                     <i class="fas fa-calculator text-2xl"></i>
@@ -53,67 +73,65 @@
                     <p class="text-zinc-400 text-sm">Scientifique • Moderne</p>
                 </div>
             </div>
-            <div class="flex items-center gap-2">
-                <button onclick="toggleMode()" id="modeBtn"
-                    class="px-4 py-2 glass rounded-2xl text-sm flex items-center gap-2 hover:bg-white/10">
-                    <i class="fas fa-sun"></i>
-                    <span id="modeText">Deg</span>
-                </button>
-            </div>
+            <button onclick="toggleMode()" id="modeBtn"
+                class="px-5 py-2 glass rounded-2xl text-sm flex items-center gap-2 hover:bg-white/10 active:scale-95">
+                <i class="fas fa-sun"></i>
+                <span id="modeText">Deg</span>
+            </button>
         </div>
 
         <!-- Display -->
-        <div class="glass rounded-3xl p-6 mb-4 shadow-2xl">
-            <div id="history" class="h-16 text-zinc-400 text-right text-sm overflow-y-auto mb-2 font-mono"></div>
-            <div id="display" class="display text-right text-5xl font-light tracking-tighter min-h-[80px] flex items-end justify-end p-4 rounded-2xl">
+        <div class="glass rounded-3xl p-6 mb-6 shadow-2xl flex-shrink-0">
+            <div id="history" class="history text-zinc-400 text-right text-sm overflow-y-auto mb-3 font-mono pr-2"></div>
+            <div id="display" class="display text-right text-6xl font-light tracking-tighter min-h-[110px] flex items-end justify-end p-5 rounded-2xl break-all">
                 0
             </div>
         </div>
 
         <!-- Keyboard -->
-        <div class="grid grid-cols-4 gap-3">
+        <div class="keyboard grid grid-cols-4 gap-3 flex-1">
             <!-- Row 1 -->
-            <button onclick="clearAll()" class="btn col-span-1 aspect-square glass rounded-3xl text-xl font-medium text-red-400 hover:bg-red-500/10">AC</button>
-            <button onclick="backspace()" class="btn col-span-1 aspect-square glass rounded-3xl text-xl font-medium"><i class="fas fa-backspace"></i></button>
-            <button onclick="appendToDisplay('(')" class="btn col-span-1 aspect-square glass rounded-3xl text-xl font-medium">(</button>
-            <button onclick="appendToDisplay(')')" class="btn col-span-1 aspect-square glass rounded-3xl text-xl font-medium">)</button>
+            <button onclick="clearAll()" class="btn col-span-1 glass rounded-3xl text-xl font-medium text-red-400 hover:bg-red-500/10 active:bg-red-500/20">AC</button>
+            <button onclick="backspace()" class="btn col-span-1 glass rounded-3xl text-xl font-medium"><i class="fas fa-backspace"></i></button>
+            <button onclick="appendToDisplay('(')" class="btn col-span-1 glass rounded-3xl text-2xl font-medium">(</button>
+            <button onclick="appendToDisplay(')')" class="btn col-span-1 glass rounded-3xl text-2xl font-medium">)</button>
 
             <!-- Row 2 -->
-            <button onclick="appendScientific('sin')" class="btn scientific col-span-1 aspect-square rounded-3xl text-lg">sin</button>
-            <button onclick="appendScientific('cos')" class="btn scientific col-span-1 aspect-square rounded-3xl text-lg">cos</button>
-            <button onclick="appendScientific('tan')" class="btn scientific col-span-1 aspect-square rounded-3xl text-lg">tan</button>
-            <button onclick="appendToDisplay('/')" class="btn operator col-span-1 aspect-square rounded-3xl text-3xl font-light">÷</button>
+            <button onclick="appendScientific('sin')" class="btn scientific col-span-1 rounded-3xl text-lg">sin</button>
+            <button onclick="appendScientific('cos')" class="btn scientific col-span-1 rounded-3xl text-lg">cos</button>
+            <button onclick="appendScientific('tan')" class="btn scientific col-span-1 rounded-3xl text-lg">tan</button>
+            <button onclick="appendToDisplay('/')" class="btn operator col-span-1 rounded-3xl text-4xl font-light">÷</button>
 
             <!-- Row 3 -->
-            <button onclick="appendScientific('log')" class="btn scientific col-span-1 aspect-square rounded-3xl text-lg">log</button>
-            <button onclick="appendScientific('ln')" class="btn scientific col-span-1 aspect-square rounded-3xl text-lg">ln</button>
-            <button onclick="appendToDisplay('√')" class="btn scientific col-span-1 aspect-square rounded-3xl text-2xl">√</button>
-            <button onclick="appendToDisplay('*')" class="btn operator col-span-1 aspect-square rounded-3xl text-3xl font-light">×</button>
+            <button onclick="appendScientific('log')" class="btn scientific col-span-1 rounded-3xl text-lg">log</button>
+            <button onclick="appendScientific('ln')" class="btn scientific col-span-1 rounded-3xl text-lg">ln</button>
+            <button onclick="appendToDisplay('√')" class="btn scientific col-span-1 rounded-3xl text-3xl">√</button>
+            <button onclick="appendToDisplay('*')" class="btn operator col-span-1 rounded-3xl text-4xl font-light">×</button>
 
             <!-- Row 4 -->
-            <button onclick="appendToDisplay('7')" class="btn col-span-1 aspect-square glass rounded-3xl text-3xl font-light">7</button>
-            <button onclick="appendToDisplay('8')" class="btn col-span-1 aspect-square glass rounded-3xl text-3xl font-light">8</button>
-            <button onclick="appendToDisplay('9')" class="btn col-span-1 aspect-square glass rounded-3xl text-3xl font-light">9</button>
-            <button onclick="appendToDisplay('-')" class="btn operator col-span-1 aspect-square rounded-3xl text-4xl font-light">−</button>
+            <button onclick="appendToDisplay('7')" class="btn col-span-1 glass rounded-3xl text-4xl font-light">7</button>
+            <button onclick="appendToDisplay('8')" class="btn col-span-1 glass rounded-3xl text-4xl font-light">8</button>
+            <button onclick="appendToDisplay('9')" class="btn col-span-1 glass rounded-3xl text-4xl font-light">9</button>
+            <button onclick="appendToDisplay('-')" class="btn operator col-span-1 rounded-3xl text-5xl font-light">−</button>
 
             <!-- Row 5 -->
-            <button onclick="appendToDisplay('4')" class="btn col-span-1 aspect-square glass rounded-3xl text-3xl font-light">4</button>
-            <button onclick="appendToDisplay('5')" class="btn col-span-1 aspect-square glass rounded-3xl text-3xl font-light">5</button>
-            <button onclick="appendToDisplay('6')" class="btn col-span-1 aspect-square glass rounded-3xl text-3xl font-light">6</button>
-            <button onclick="appendToDisplay('+')" class="btn operator col-span-1 aspect-square rounded-3xl text-3xl font-light">+</button>
+            <button onclick="appendToDisplay('4')" class="btn col-span-1 glass rounded-3xl text-4xl font-light">4</button>
+            <button onclick="appendToDisplay('5')" class="btn col-span-1 glass rounded-3xl text-4xl font-light">5</button>
+            <button onclick="appendToDisplay('6')" class="btn col-span-1 glass rounded-3xl text-4xl font-light">6</button>
+            <button onclick="appendToDisplay('+')" class="btn operator col-span-1 rounded-3xl text-4xl font-light">+</button>
 
             <!-- Row 6 -->
-            <button onclick="appendToDisplay('1')" class="btn col-span-1 aspect-square glass rounded-3xl text-3xl font-light">1</button>
-            <button onclick="appendToDisplay('2')" class="btn col-span-1 aspect-square glass rounded-3xl text-3xl font-light">2</button>
-            <button onclick="appendToDisplay('3')" class="btn col-span-1 aspect-square glass rounded-3xl text-3xl font-light">3</button>
-            <button onclick="calculate()" class="btn col-span-1 row-span-2 bg-orange-500 hover:bg-orange-600 rounded-3xl text-4xl font-light text-white flex items-center justify-center">=</button>
+            <button onclick="appendToDisplay('1')" class="btn col-span-1 glass rounded-3xl text-4xl font-light">1</button>
+            <button onclick="appendToDisplay('2')" class="btn col-span-1 glass rounded-3xl text-4xl font-light">2</button>
+            <button onclick="appendToDisplay('3')" class="btn col-span-1 glass rounded-3xl text-4xl font-light">3</button>
+            <button onclick="calculate()" class="btn col-span-1 row-span-2 bg-gradient-to-br from-orange-500 to-amber-500 hover:brightness-110 rounded-3xl text-5xl font-light text-white flex items-center justify-center active:scale-95">=</button>
 
             <!-- Row 7 -->
-            <button onclick="appendToDisplay('0')" class="btn col-span-2 aspect-square glass rounded-3xl text-3xl font-light">0</button>
-            <button onclick="appendToDisplay('.')" class="btn col-span-1 aspect-square glass rounded-3xl text-4xl font-light">.</button>
+            <button onclick="appendToDisplay('0')" class="btn col-span-2 glass rounded-3xl text-4xl font-light">0</button>
+            <button onclick="appendToDisplay('.')" class="btn col-span-1 glass rounded-3xl text-5xl font-light">.</button>
         </div>
 
-        <div class="text-center mt-8 text-zinc-500 text-xs flex items-center justify-center gap-4">
+        <div class="text-center mt-6 text-zinc-500 text-xs flex items-center justify-center gap-4 flex-shrink-0">
             <a href="https://github.com/samizia31/scientific-calculator" target="_blank" class="hover:text-white transition-colors">GitHub</a>
             <span>•</span>
             <span>Made with ❤️ par Grok</span>
@@ -122,7 +140,7 @@
 
     <script>
         let display = document.getElementById('display');
-        let history = document.getElementById('history');
+        let historyEl = document.getElementById('history');
         let currentInput = '0';
         let isNewCalculation = false;
         let isDegreeMode = true;
@@ -133,10 +151,9 @@
 
         function appendToDisplay(value) {
             if (isNewCalculation) {
-                currentInput = '0';
+                currentInput = value === '.' ? '0.' : value;
                 isNewCalculation = false;
-            }
-            if (currentInput === '0' && value !== '.' && !['+', '-', '*', '/'].includes(value)) {
+            } else if (currentInput === '0' && value !== '.' && !'+-*/'.includes(value)) {
                 currentInput = value;
             } else {
                 currentInput += value;
@@ -146,7 +163,7 @@
 
         function appendScientific(func) {
             if (isNewCalculation) {
-                currentInput = '0';
+                currentInput = '';
                 isNewCalculation = false;
             }
             currentInput += func + '(';
@@ -155,8 +172,8 @@
 
         function clearAll() {
             currentInput = '0';
+            historyEl.innerHTML = '';
             updateDisplay();
-            history.innerHTML = '';
         }
 
         function backspace() {
@@ -173,6 +190,8 @@
             const btn = document.getElementById('modeBtn');
             const text = document.getElementById('modeText');
             text.textContent = isDegreeMode ? 'Deg' : 'Rad';
+            btn.querySelector('i').classList.toggle('fa-sun', isDegreeMode);
+            btn.querySelector('i').classList.toggle('fa-moon', !isDegreeMode);
         }
 
         function calculate() {
@@ -181,23 +200,23 @@
                     .replace(/√/g, 'Math.sqrt')
                     .replace(/×/g, '*')
                     .replace(/÷/g, '/')
-                    .replace(/sin\(/g, isDegreeMode ? 'Math.sin(Math.PI/180 * ' : 'Math.sin(')
-                    .replace(/cos\(/g, isDegreeMode ? 'Math.cos(Math.PI/180 * ' : 'Math.cos(')
-                    .replace(/tan\(/g, isDegreeMode ? 'Math.tan(Math.PI/180 * ' : 'Math.tan(')
+                    .replace(/sin\(/g, isDegreeMode ? 'Math.sin((Math.PI/180) * ' : 'Math.sin(')
+                    .replace(/cos\(/g, isDegreeMode ? 'Math.cos((Math.PI/180) * ' : 'Math.cos(')
+                    .replace(/tan\(/g, isDegreeMode ? 'Math.tan((Math.PI/180) * ' : 'Math.tan(')
                     .replace(/log/g, 'Math.log10')
                     .replace(/ln/g, 'Math.log');
 
-                // Handle closing parentheses
                 let openCount = (expression.match(/\(/g) || []).length;
                 let closeCount = (expression.match(/\)/g) || []).length;
                 expression += ')'.repeat(Math.max(0, openCount - closeCount));
 
                 let result = eval(expression);
+                const formattedResult = parseFloat(result.toFixed(8));
 
-                history.innerHTML += `<div>${currentInput} = ${parseFloat(result.toFixed(8))}</div>`;
-                history.scrollTop = history.scrollHeight;
+                historyEl.innerHTML += `<div class="text-xs opacity-75">${currentInput} = ${formattedResult}</div>`;
+                historyEl.scrollTop = historyEl.scrollHeight;
 
-                currentInput = parseFloat(result.toFixed(8)).toString();
+                currentInput = formattedResult.toString();
                 isNewCalculation = true;
                 updateDisplay();
             } catch (e) {
@@ -207,13 +226,17 @@
             }
         }
 
+        // Keyboard support
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Enter' || e.key === '=') calculate();
             if (e.key === 'Backspace') backspace();
             if (e.key === 'Escape') clearAll();
             if ('0123456789.+-*/()'.includes(e.key)) appendToDisplay(e.key);
+            if (e.key === '*') appendToDisplay('*');
+            if (e.key === '/') appendToDisplay('/');
         });
 
+        // Initial display
         updateDisplay();
     </script>
 </body>
